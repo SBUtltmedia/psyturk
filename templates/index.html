@@ -68,7 +68,7 @@ function nonzeros(arr){
 // Event listeners on left and right arrow keys.
 function checkKey(e) {
     e = e || window.event;
-    if (e.keyCode == '37' || e.keyCode== '39' && trial < trialCap) { 
+    if ((e.keyCode == '37' || e.keyCode== '39') && trial < trialCap) { 
         trial++;
         $("#trialCounter").text(trial);
         choices.shift();
