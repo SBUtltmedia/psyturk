@@ -1,82 +1,132 @@
 <!DOCTYPE html>
 <head>
 
-<style>
+    <style>
 
-body{
-    text-align: center;
-}
+        body{
+            text-align: center;
+        }
 
-.option{
-padding: 10%;
-         margin-right: 30px;
-border: 2px solid #a1a1a1;
-        border-radius: 25px; 
-display: inline-block;
+        .option{
+            padding: 10%;
+            margin-right: 30px;
+            border: 2px solid #a1a1a1;
+            border-radius: 25px; 
+            display: inline-block;
 
-}
-</style>
-<script
-src="https://code.jquery.com/jquery-3.2.1.min.js"
-integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-crossorigin="anonymous"></script>
+        }
+    </style>
+    <script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
 </head>
 
 
 <body>
-    {{name.assignmentId}}<p>test</p>
 
-<h3>Trial Count: <span id="trialCounter"></span></h3>
-
-<div id="left" class='option'>
-<p id="leftValue">0</p>
-</div>
-
-
-<div id="left" class='option'>
-<p id="rightValue">0</p>
-</div>
+    <form id = "endForm" action="https://workersandbox.mturk.com/mturk/externalSubmit" method="POST">
+        <input type="hidden" id="user-input" value="" name="user-input"/>
+        <input type="hidden" id="assignmentId" value="" name="assignmentId"/>
+        <input type="hidden" id="workerId" value="" name="workerId"/>
+        <input type="hidden" id="hitId" value="" name="hitId"/>
+    </form>
 
 
-<script>
+    <h3>Trial Count: <span id="trialCounter"></span></h3>
 
-//Initialization
-var choices=[]
-var trial=1;
-var trialCap=120;
+    <div id="left" class='option'>
+        <p id="leftValue">0</p>
+    </div>
 
-$("#trialCounter").text(trial);
 
-for (var i=0; i<10;i++){
-    choices.push(i%2); 
-} 
+    <div id="left" class='option'>
+        <p id="rightValue">0</p>
+    </div>
 
-$("#leftValue").text(6+nonzeros(choices));
-$("#rightValue").text(1+nonzeros(choices));
 
-document.onkeydown = checkKey;
+    <script>
+        // Load in query parameters
+        (function($) {
+            $.QueryString = (function(a) {
+                if (a == "") return {};
+                var b = {};
+                for (var i = 0; i < a.length; ++i)
+                {
+                    var p=a[i].split('=', 2);
+                    if (p.length != 2) continue;
+                    b[p[0]] = decodeURIComponent(p[1].replace(/\+/g, " "));
+                }
+                return b;
+            })(window.location.search.substr(1).split('&'))
+        })(jQuery);
 
-// Count non zeros in an array
-function nonzeros(arr){
-    var count=0;
-    for (var i=0; i<arr.length;i++){
-        if (arr[i]!=0) count++;
-    }
-    return count;
-}
+console.log($.QueryString.turkSubmitTo + "/mturk/externalSubmit")
+        // submission
+        function submitResults(){
+            $("#assignmentId").val($.QueryString.assignmentId);
+            $("#hitId").val($.QueryString.hitId);
+            $("#workerId").val($.QueryString.workerId);
+            $("#user-input").val("Dominoes");
 
-// Event listeners on left and right arrow keys.
-function checkKey(e) {
-    e = e || window.event;
-    if ((e.keyCode == '37' || e.keyCode== '39') && trial < trialCap) { 
-        trial++;
+/*
+            $.ajax({
+                method: "POST",
+                url: $.QueryString.turkSubmitTo + "/mturk/externalSubmit",
+                data: { 
+                    "assignmentId": $.QueryString.assignmentId,
+                    "hitId": $.QueryString.hitId,
+                    "workerId": $.QueryString.workerId,
+                    "user-input": "Dominoes"
+                }
+            })
+            .done(function( msg ) {
+                alert( "Data Saved: " + msg );
+            });
+            */
+            $("#endForm").submit()
+        }
+
+
+        //Initialization
+        var choices=[]
+        var trial=1;
+        var trialCap=5;
+
         $("#trialCounter").text(trial);
-        choices.shift();
-        choices.push(e.keyCode=='37'?0:1);
+
+        for (var i=0; i<10;i++){
+            choices.push(i%2); 
+        } 
+
         $("#leftValue").text(6+nonzeros(choices));
         $("#rightValue").text(1+nonzeros(choices));
-    }
-}
-</script>
+
+        document.onkeydown = checkKey;
+
+        // Count non zeros in an array
+        function nonzeros(arr){
+            var count=0;
+            for (var i=0; i<arr.length;i++){
+                if (arr[i]!=0) count++;
+            }
+            return count;
+        }
+
+        // Event listeners on left and right arrow keys.
+        function checkKey(e) {
+            e = e || window.event;
+            if ((e.keyCode == '37' || e.keyCode== '39') && trial < trialCap) { 
+                trial++;
+                $("#trialCounter").text(trial);
+                choices.shift();
+                choices.push(e.keyCode=='37'?0:1);
+                $("#leftValue").text(6+nonzeros(choices));
+                $("#rightValue").text(1+nonzeros(choices));
+            }
+            if (trial >= trialCap) 
+                submitResults();
+        }
+    </script>
 </body>
 

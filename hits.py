@@ -32,7 +32,7 @@ qualifications.add(NumberHitsApprovedRequirement(comparator="GreaterThan", integ
 
 #This url will be the url of your application, with appropriate GET parameters
 
-url = "http://www.google.com/" 
+url = "https://apps.tlt.stonybrook.edu/mturkTest/index.html" 
 questionform = ExternalQuestion(url, frame_height)
 create_hit_result = connection.create_hit(
         title="Insert the title of your HIT",
