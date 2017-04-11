@@ -27,8 +27,8 @@ frame_height = 800
 
 #Here, I create two sample qualifications
 qualifications = Qualifications()
-qualifications.add(PercentAssignmentsApprovedRequirement(comparator="GreaterThan", integer_value="90"))
-qualifications.add(NumberHitsApprovedRequirement(comparator="GreaterThan", integer_value="100"))
+#qualifications.add(PercentAssignmentsApprovedRequirement(comparator="GreaterThan", integer_value="90"))
+#qualifications.add(NumberHitsApprovedRequirement(comparator="GreaterThan", integer_value="100"))
 
 #This url will be the url of your application, with appropriate GET parameters
 
