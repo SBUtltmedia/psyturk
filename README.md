@@ -1,4 +1,4 @@
-### psyturk
+# psyturk
 
 Mturk hit maker for embedding user website in xframe of mturk site.
 
