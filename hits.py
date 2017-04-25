@@ -1,52 +1,41 @@
-import os
-from flask import Flask, render_template, url_for, request, make_response
-from boto.mturk.connection import MTurkConnection
+import boto3
+import boto
 from boto.mturk.question import ExternalQuestion
-from boto.mturk.qualification import Qualifications, PercentAssignmentsApprovedRequirement, NumberHitsApprovedRequirement
 from boto.mturk.price import Price
+import settings
 
 region_name = 'us-east-1'
-aws_access_key_id = ''
-aws_secret_access_key = ''
-
 endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
 
 # Uncomment this line to use in production
 # endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
 
-connection = MTurkConnection(aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,
-        host=endpoint_url)
-print connection.APIVersion 
+client = boto3.client('mturk',
+        endpoint_url = endpoint_url,
+        region_name = region_name,
+        aws_access_key_id = settings.aws_access_key_id,
+        aws_secret_access_key = settings.aws_secret_access_key,
+        )
 
 #5 cents per HIT
-amount = 0.05
+amount = "0.05"
 
 #frame_height in pixels
 frame_height = 800
 
-#Here, I create two sample qualifications
-qualifications = Qualifications()
+#qualifications = Qualifications()
 #qualifications.add(PercentAssignmentsApprovedRequirement(comparator="GreaterThan", integer_value="90"))
 #qualifications.add(NumberHitsApprovedRequirement(comparator="GreaterThan", integer_value="100"))
 
-#This url will be the url of your application, with appropriate GET parameters
+questionform = ExternalQuestion(settings.url, frame_height).get_as_xml()
 
-url = "https://apps.tlt.stonybrook.edu/mturkTest/index.html" 
-questionform = ExternalQuestion(url, frame_height)
-create_hit_result = connection.create_hit(
-        title="Insert the title of your HIT",
-        description="Insert your description here",
-        keywords=["add", "some", "keywords"],
-        #duration is in seconds
-        duration = 60*60,
-        #max_assignments will set the amount of independent copies of the task (turkers can only see one)
-        max_assignments=15,
-        question=questionform,
-        reward=Price(amount=amount),
-        #Determines information returned by method in API, not super important
-        response_groups=('Minimal', 'HITDetail'), 
-        qualifications=qualifications,
+create_hit_result = client.create_hit(
+        Title="Insert the title of your HIT",
+        Description="Insert your description here",
+        Keywords="add, some, keywords",
+        AssignmentDurationInSeconds = 60*60,
+        MaxAssignments=15,
+        Question=questionform,
+        Reward=amount,
+        LifetimeInSeconds = 60*60
         )
-#create_hit_result = connection.create_hit()
-print create_hit_result
